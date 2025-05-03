@@ -8,20 +8,38 @@ Description: >
 # More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 10
+    MemorySize: 128
 
 Resources:
-  HelloWorldFunction:
+  myVocationalTestFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
       PackageType: Image
       Architectures:
         - x86_64
+
+       # —————— Variables de entorno ——————
+      Environment:
+        Variables:
+          BUCKET_NAME: psychometrictest
+
+      # —————— Permisos S3 GetObject ——————
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:GetObject
+              Resource:
+                - arn:aws:s3:::psychometrictest/*
+
+      # —————— Exponer en API Gateway ——————
       Events:
-        HelloWorld:
-          Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+        GetVocationalTest:
+          Type: HttpApi
           Properties:
-            Path: /hello
+            Path: /vocational
             Method: get
     Metadata:
       Dockerfile: Dockerfile
@@ -29,15 +47,10 @@ Resources:
       DockerTag: python3.13-v1
 
 Outputs:
-  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
-  # Find out more about other implicit resources you can reference within SAM
-  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  myVocationalTestFunction:
+    Description: Hello World second Lambda Function ARN
+    Value: !GetAtt myVocationalTestFunction.Arn
+
+  myVocationalTestFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World second function
+    Value: !GetAtt myVocationalTestFunctionRole.Arn
