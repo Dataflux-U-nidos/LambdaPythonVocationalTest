@@ -36,10 +36,7 @@ def lambda_handler(event, context):
         return {
             'statusCode': 200,
             'headers': {'Content-Type': 'application/json'},
-            'body': json.dumps({
-                'version': version,
-                'schema': schema
-            })
+            'body': json.dumps(schema)
         }
 
     except ClientError as e:
